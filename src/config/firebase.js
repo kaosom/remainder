@@ -1,7 +1,7 @@
 const admin = require('firebase-admin');
 const path = require('path');
 
-const serviceAccountPath = path.resolve(__dirname, '../etc/secrets/firebaseKey.json');
+const serviceAccountPath = path.resolve(__dirname, '/etc/secrets/firebaseKey.json');
 
 const initializeFirebase = () => {
   const serviceAccount = require(serviceAccountPath);
