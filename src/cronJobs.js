@@ -4,19 +4,19 @@ const admin = require('firebase-admin');
 const moment = require('moment-timezone');
 
 const scheduleCronJobs = () => {
-  // Testear con 1 minuto
+  // Configura la tarea cron para ejecutarse cada 10 minutos
   cron.schedule('* * * * *', async () => {
-    // Zona horaria de Kansas City
-    const now = moment.tz("America/Chicago").toDate();
-    const oneHourLater = moment.tz("America/Chicago").add(1, 'hour').toDate();
+    // Obtén la fecha y hora actuales en la zona horaria de Kansas City
+    const now = moment.tz("America/Chicago");
+    const oneHourLater = moment.tz("America/Chicago").add(1, 'hour');
 
-    console.log(`Now ${now} later ${oneHourLater}`);
+    console.log(`Now ${now.format()} later ${oneHourLater.format()}`);
 
     try {
       const database = db();
       const snapshot = await database.collection('events')
-        .where('date', '>', now)
-        .where('date', '<=', oneHourLater)
+        .where('date', '>', now.toDate())
+        .where('date', '<=', oneHourLater.toDate())
         .where('reminderSent', '==', false)
         .get();
 
@@ -29,8 +29,10 @@ const scheduleCronJobs = () => {
         const eventData = doc.data();
         const clientData = eventData.client;
 
-        const eventDate = eventData.date.toDate();
+        // Asegúrate de que eventData.date es una marca de tiempo válida y conviértela a Date
+        const eventDate = moment(eventData.date.toDate()).tz("America/Chicago").format('LLLL');
 
+        // Formato del email según el ejemplo proporcionado
         await database.collection('email').add({
           to: 'david@aztecconstructionkc.com',
           message: {
