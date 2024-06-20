@@ -4,8 +4,8 @@ const admin = require('firebase-admin');
 const moment = require('moment-timezone');
 
 const scheduleCronJobs = () => {
-  // Ejecutarse cada 10 minutos
-  cron.schedule('*/10 * * * *', async () => {
+  // Testear con 1 minuto
+  cron.schedule('* * * * *', async () => {
     // Zona horaria de Kansas City
     const now = moment.tz("America/Chicago").toDate();
     const oneHourLater = moment.tz("America/Chicago").add(1, 'hour').toDate();
