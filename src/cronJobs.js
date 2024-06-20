@@ -5,7 +5,7 @@ const moment = require('moment-timezone');
 
 const scheduleCronJobs = () => {
   // Configura la tarea cron para ejecutarse cada 10 minutos
-  cron.schedule('* * * * *', async () => {
+  cron.schedule('*/10 * * * *', async () => {
     // Obtén la fecha y hora actuales en la zona horaria de Kansas City
     const now = moment.tz("America/Chicago");
     const oneHourLater = moment.tz("America/Chicago").add(1, 'hour');
