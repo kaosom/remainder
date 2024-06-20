@@ -1,11 +1,15 @@
 const cron = require('node-cron');
 const { db } = require('./config/firebase');
 const admin = require('firebase-admin');
+const moment = require('moment-timezone');
 
 const scheduleCronJobs = () => {
-  cron.schedule('* * * * *', async () => {
-    const now = new Date();
-    const oneHourLater = new Date(now.getTime() + 60 * 60 * 1000);
+  // Ejecutarse cada 10 minutos
+  cron.schedule('*/10 * * * *', async () => {
+    // Zona horaria de Kansas City
+    const now = moment.tz("America/Chicago").toDate();
+    const oneHourLater = moment.tz("America/Chicago").add(1, 'hour').toDate();
+
     console.log(`Now ${now} later ${oneHourLater}`);
 
     try {
@@ -16,9 +20,16 @@ const scheduleCronJobs = () => {
         .where('reminderSent', '==', false)
         .get();
 
+      if (snapshot.empty) {
+        console.log('No upcoming events found.');
+        return;
+      }
+
       snapshot.forEach(async doc => {
         const eventData = doc.data();
         const clientData = eventData.client;
+
+        const eventDate = eventData.date.toDate();
 
         await database.collection('email').add({
           to: 'david@aztecconstructionkc.com',
@@ -73,7 +84,7 @@ const scheduleCronJobs = () => {
                     <p>Dear David Morales,</p>
                     <p>This is a reminder for the upcoming event:</p>
                     <p><strong>Event:</strong> ${eventData.title}</p>
-                    <p><strong>Date and Time:</strong> ${eventData.date.toDate()}</p>
+                    <p><strong>Date and Time:</strong> ${eventDate}</p>
                     <p><strong>Location:</strong> ${eventData.location}</p>
                   </div>
                   <div class="footer">
